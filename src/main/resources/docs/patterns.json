@@ -1,0 +1,10 @@
+{
+  "name": "SQLint",
+  "patterns": [
+    {
+      "patternId": "allIssues",
+      "level": "Error",
+      "category": "ErrorProne"
+    }
+  ]
+}
