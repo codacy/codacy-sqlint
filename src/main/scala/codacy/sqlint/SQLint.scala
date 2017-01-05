@@ -12,9 +12,11 @@ object SQLint extends Tool {
   override def apply(source: Source.Directory, configuration: Option[List[Pattern.Definition]], files: Option[Set[Source.File]])
                     (implicit specification: Tool.Specification): Try[List[Result]] = {
     Try {
-      ToolHelper.patternsToLint(configuration).collect { case patterns if patterns.nonEmpty =>
+      val dockerResults = for {
+        patterns <- ToolHelper.patternsToLint(configuration)
         //This tool returns all messages mapped to only one pattern
-        implicit val godPattern = patterns.head
+        pattern <- patterns.headOption
+      } yield {
         val path = new java.io.File(source.path)
         val filesToLint: Set[String] = ToolHelper.filesToLint(source, files)
 
@@ -22,7 +24,7 @@ object SQLint extends Tool {
 
         CommandRunner.exec(command, Some(path)) match {
           case Right(resultFromTool) if resultFromTool.exitCode < 2 =>
-            Success(parseToolResult(resultFromTool.stdout))
+            Success(parseToolResult(resultFromTool.stdout, pattern))
           case Right(resultFromTool) =>
             val msg =
               s"""
@@ -34,22 +36,23 @@ object SQLint extends Tool {
           case Left(e) =>
             Failure(e)
         }
-      }.getOrElse(Success(List.empty[Result]))
+      }
+      dockerResults.getOrElse(Success(List.empty[Result]))
     }.flatten
   }
 
-  private def parseToolResult(outputLines: List[String])(implicit godPattern: Pattern.Definition): List[Result] = {
-    outputLines.flatMap(parseLineResult(_))
+  private def parseToolResult(outputLines: List[String], pattern: Pattern.Definition): List[Result] = {
+    outputLines.flatMap(parseLineResult(_, pattern))
   }
 
-  private def parseLineResult(resultLine: String)(implicit godPattern: Pattern.Definition): Option[Result] = {
+  private def parseLineResult(resultLine: String, pattern: Pattern.Definition): Option[Result] = {
     val LineRegex = """(.*?):([0-9]+):[0-9]*:?(ERROR|WARNING)\s*(.*)""".r
 
     Option(resultLine).collect { case LineRegex(filename, lineNumber, _, message) =>
       Issue(
         Source.File(filename),
         Result.Message(message),
-        godPattern.patternId,
+        pattern.patternId,
         Source.Line(lineNumber.toInt)
       )
     }
