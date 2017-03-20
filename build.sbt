@@ -26,12 +26,6 @@ version in Docker := "1.0"
 
 val sqlintVersion = "0.1.4"
 
-val installAll =
-  s"""apt-get update &&
-     |apt-get -y install ruby build-essential ruby-dev &&
-     |gem install --no-rdoc --no-ri sqlint -v $sqlintVersion
-     |""".stripMargin.replaceAll(System.lineSeparator(), " ")
-
 mappings in Universal <++= (resourceDirectory in Compile) map { (resourceDir: File) =>
   val src = resourceDir / "docs"
   val dest = "/docs"
@@ -41,7 +35,6 @@ mappings in Universal <++= (resourceDirectory in Compile) map { (resourceDir: Fi
     if !path.isDirectory
   } yield path -> path.toString.replaceFirst(src.toString, dest)
 }
-
 val dockerUser = "docker"
 val dockerGroup = "docker"
 
@@ -49,16 +42,24 @@ daemonUser in Docker := dockerUser
 
 daemonGroup in Docker := dockerGroup
 
-dockerBaseImage := "rtfpessoa/ubuntu-jdk8"
+dockerBaseImage := "develar/java"
+
+val installAll =
+  s"""apk --no-cache add bash build-base ruby ruby-dev tar curl &&
+     |apk add --update ca-certificates &&
+     |gem install --no-ri --no-rdoc sqlint -v $sqlintVersion &&
+     |gem cleanup &&
+     |apk del build-base ruby-dev tar curl &&
+     |rm -rf /tmp/* &&
+     |rm -rf /var/cache/apk/*""".stripMargin.replaceAll(System.lineSeparator(), " ")
 
 dockerCommands := dockerCommands.value.flatMap {
   case cmd@Cmd("WORKDIR", _) => List(cmd,
     Cmd("RUN", installAll)
   )
+
   case cmd@(Cmd("ADD", "opt /opt")) => List(cmd,
-    Cmd("RUN", "mv /opt/docker/docs /docs"),
-    Cmd("RUN", "adduser --uid 2004 --disabled-password --gecos \"\" docker"),
-    ExecCmd("RUN", Seq("chown", "-R", s"$dockerUser:$dockerGroup", "/docs"): _*)
+    Cmd("RUN", s"adduser -u 2004 -D $dockerUser")
   )
   case other => List(other)
 }
