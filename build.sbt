@@ -60,7 +60,7 @@ dockerCommands := dockerCommands.value.flatMap {
   )
   case cmd@(Cmd("ADD", "opt /opt")) => List(cmd,
     Cmd("RUN", "mv /opt/docker/docs /docs"),
-    Cmd("RUN", "adduser --uid 2004 --disabled-password --gecos \"\" docker"),
+    Cmd("RUN", "adduser -u 2004 -D docker"),
     ExecCmd("RUN", Seq("chown", "-R", s"$dockerUser:$dockerGroup", "/docs"): _*)
   )
   case other => List(other)
