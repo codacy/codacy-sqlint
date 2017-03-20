@@ -35,14 +35,6 @@ mappings in Universal <++= (resourceDirectory in Compile) map { (resourceDir: Fi
     if !path.isDirectory
   } yield path -> path.toString.replaceFirst(src.toString, dest)
 }
-val dockerUser = "docker"
-val dockerGroup = "docker"
-
-daemonUser in Docker := dockerUser
-
-daemonGroup in Docker := dockerGroup
-
-dockerBaseImage := "develar/java"
 
 val installAll =
   s"""apk --no-cache add bash build-base ruby ruby-dev tar curl &&
@@ -53,13 +45,23 @@ val installAll =
      |rm -rf /tmp/* &&
      |rm -rf /var/cache/apk/*""".stripMargin.replaceAll(System.lineSeparator(), " ")
 
+val dockerUser = "docker"
+val dockerGroup = "docker"
+
+daemonUser in Docker := dockerUser
+
+daemonGroup in Docker := dockerGroup
+
+dockerBaseImage := "develar/java"
+
 dockerCommands := dockerCommands.value.flatMap {
   case cmd@Cmd("WORKDIR", _) => List(cmd,
     Cmd("RUN", installAll)
   )
-
   case cmd@(Cmd("ADD", "opt /opt")) => List(cmd,
-    Cmd("RUN", s"adduser -u 2004 -D $dockerUser")
+    Cmd("RUN", "mv /opt/docker/docs /docs"),
+    Cmd("RUN", "adduser --uid 2004 --disabled-password --gecos \"\" docker"),
+    ExecCmd("RUN", Seq("chown", "-R", s"$dockerUser:$dockerGroup", "/docs"): _*)
   )
   case other => List(other)
 }
