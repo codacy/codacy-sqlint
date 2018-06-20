@@ -1,5 +1,8 @@
 import com.typesafe.sbt.packager.docker.{Cmd, ExecCmd}
 
+import scala.io.Source
+import scala.util.parsing.json.JSON
+
 name := """codacy-engine-sqlint"""
 
 version := "1.0-SNAPSHOT"
@@ -24,7 +27,15 @@ enablePlugins(DockerPlugin)
 
 version in Docker := "1.0"
 
-val sqlintVersion = "0.1.4"
+lazy val toolVersion = TaskKey[String]("Retrieve the version of the underlying tool from patterns.json")
+
+toolVersion := {
+  val jsonFile = (resourceDirectory in Compile).value / "docs" / "patterns.json"
+  val toolMap = JSON.parseFull(Source.fromFile(jsonFile).getLines().mkString)
+    .getOrElse(throw new Exception("patterns.json is not a valid json"))
+    .asInstanceOf[Map[String, String]]
+  toolMap.getOrElse[String]("version", throw new Exception("Failed to retrieve 'version' from patterns.json"))
+}
 
 mappings in Universal <++= (resourceDirectory in Compile) map { (resourceDir: File) =>
   val src = resourceDir / "docs"
@@ -36,10 +47,10 @@ mappings in Universal <++= (resourceDirectory in Compile) map { (resourceDir: Fi
   } yield path -> path.toString.replaceFirst(src.toString, dest)
 }
 
-val installAll =
+def installAll(toolVersion: String) =
   s"""apk --no-cache add bash build-base ruby ruby-dev tar curl &&
      |apk add --update ca-certificates &&
-     |gem install --no-ri --no-rdoc sqlint -v $sqlintVersion &&
+     |gem install --no-ri --no-rdoc sqlint -v $toolVersion &&
      |gem cleanup &&
      |apk del build-base ruby-dev tar curl &&
      |rm -rf /tmp/* &&
@@ -52,16 +63,17 @@ daemonUser in Docker := dockerUser
 
 daemonGroup in Docker := dockerGroup
 
-dockerBaseImage := "develar/java"
+dockerBaseImage := "openjdk:8-jre-alpine"
 
-dockerCommands := dockerCommands.value.flatMap {
-  case cmd@Cmd("WORKDIR", _) => List(cmd,
-    Cmd("RUN", installAll)
-  )
-  case cmd@(Cmd("ADD", "opt /opt")) => List(cmd,
-    Cmd("RUN", "mv /opt/docker/docs /docs"),
-    Cmd("RUN", "adduser -u 2004 -D docker"),
-    ExecCmd("RUN", Seq("chown", "-R", s"$dockerUser:$dockerGroup", "/docs"): _*)
-  )
-  case other => List(other)
+dockerCommands := {
+  dockerCommands.dependsOn(toolVersion).value.flatMap {
+    case cmd@(Cmd("ADD", _)) => List(
+      Cmd("RUN", s"adduser -u 2004 -D $dockerUser"),
+      cmd,
+      Cmd("RUN", installAll(toolVersion.value)),
+      Cmd("RUN", "mv /opt/docker/docs /docs"),
+      ExecCmd("RUN", Seq("chown", "-R", s"$dockerUser:$dockerGroup", "/docs"): _*)
+    )
+    case other => List(other)
+  }
 }
