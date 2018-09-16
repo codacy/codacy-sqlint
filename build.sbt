@@ -48,7 +48,7 @@ mappings in Universal <++= (resourceDirectory in Compile) map { (resourceDir: Fi
 }
 
 def installAll(toolVersion: String) =
-  s"""apk --no-cache add bash build-base ruby ruby-dev tar curl &&
+  s"""apk --no-cache add bash build-base ruby ruby-dev ruby-json tar curl &&
      |apk add --update ca-certificates &&
      |gem install --no-ri --no-rdoc sqlint -v $toolVersion &&
      |gem cleanup &&

@@ -1,0 +1,8 @@
+[
+  {
+    "patternId": "allIssues",
+    "title": "Checks SQL against the ANSI syntax",
+    "description": "Checks SQL against the ANSI syntax",
+    "timeToFix": 5
+  }
+]
