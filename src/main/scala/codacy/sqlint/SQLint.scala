@@ -1,24 +1,29 @@
 package codacy.sqlint
 
-import codacy.docker.api.Result.Issue
-import codacy.docker.api.utils.ToolHelper
-import codacy.docker.api.{Pattern, Result, Source, Tool}
-import codacy.dockerApi.utils.CommandRunner
+import com.codacy.plugins.api.results.Result.Issue
+import com.codacy.plugins.api.{Options, Source}
+import com.codacy.plugins.api.results.{Pattern, Result, Tool}
+import com.codacy.tools.scala.seed.utils.CommandRunner
+import com.codacy.tools.scala.seed.utils.ToolHelper._
 
 import scala.util.{Failure, Properties, Success, Try}
 
 object SQLint extends Tool {
 
-  override def apply(source: Source.Directory, configuration: Option[List[Pattern.Definition]], files: Option[Set[Source.File]])
-                    (implicit specification: Tool.Specification): Try[List[Result]] = {
+  def apply(source: Source.Directory,
+            configuration: Option[List[Pattern.Definition]],
+            files: Option[Set[Source.File]],
+            options: Map[Options.Key, Options.Value])(implicit specification: Tool.Specification): Try[List[Result]] = {
     Try {
       val dockerResults = for {
-        patterns <- ToolHelper.patternsToLint(configuration)
+        patterns <- configuration.withDefaultParameters(specification)
         //This tool returns all messages mapped to only one pattern
         pattern <- patterns.headOption
       } yield {
         val path = new java.io.File(source.path)
-        val filesToLint: Set[String] = ToolHelper.filesToLint(source, files)
+        val filesToLint: Set[String] = files.fold(Set(source.path)) { files =>
+          files.map(_.path)
+        }
 
         val command = List("sqlint") ++ filesToLint
 

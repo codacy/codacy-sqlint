@@ -7,7 +7,7 @@ name := """codacy-engine-sqlint"""
 
 version := "1.0-SNAPSHOT"
 
-val languageVersion = "2.11.7"
+val languageVersion = "2.12.7"
 
 scalaVersion := languageVersion
 
@@ -17,8 +17,8 @@ resolvers ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.3.10",
-  "com.codacy" %% "codacy-engine-scala-seed" % "2.7.2"
+  "com.typesafe.play" %% "play-json" % "2.7.3",
+  "com.codacy" %% "codacy-engine-scala-seed" % "3.0.9"
 )
 
 enablePlugins(JavaAppPackaging)
