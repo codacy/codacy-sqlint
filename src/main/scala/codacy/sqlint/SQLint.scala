@@ -21,9 +21,7 @@ object SQLint extends Tool {
         pattern <- patterns.headOption
       } yield {
         val path = new java.io.File(source.path)
-        val filesToLint: Set[String] = files.fold(Set(source.path)) { files =>
-          files.map(_.path)
-        }
+        val filesToLint: Set[String] = files.fold(Set(source.path))(_.map(_.path))
 
         val command = List("sqlint") ++ filesToLint
 
