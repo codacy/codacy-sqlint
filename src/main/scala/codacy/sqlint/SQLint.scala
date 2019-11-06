@@ -10,10 +10,12 @@ import scala.util.{Failure, Properties, Success, Try}
 
 object SQLint extends Tool {
 
-  def apply(source: Source.Directory,
-            configuration: Option[List[Pattern.Definition]],
-            files: Option[Set[Source.File]],
-            options: Map[Options.Key, Options.Value])(implicit specification: Tool.Specification): Try[List[Result]] = {
+  def apply(
+      source: Source.Directory,
+      configuration: Option[List[Pattern.Definition]],
+      files: Option[Set[Source.File]],
+      options: Map[Options.Key, Options.Value]
+  )(implicit specification: Tool.Specification): Try[List[Result]] = {
     Try {
       val dockerResults = for {
         patterns <- configuration.withDefaultParameters(specification)
@@ -51,13 +53,9 @@ object SQLint extends Tool {
   private def parseLineResult(resultLine: String, pattern: Pattern.Definition): Option[Result] = {
     val LineRegex = """(.*?):([0-9]+):[0-9]*:?(ERROR|WARNING)\s*(.*)""".r
 
-    Option(resultLine).collect { case LineRegex(filename, lineNumber, _, message) =>
-      Issue(
-        Source.File(filename),
-        Result.Message(message),
-        pattern.patternId,
-        Source.Line(lineNumber.toInt)
-      )
+    Option(resultLine).collect {
+      case LineRegex(filename, lineNumber, _, message) =>
+        Issue(Source.File(filename), Result.Message(message), pattern.patternId, Source.Line(lineNumber.toInt))
     }
   }
 }
