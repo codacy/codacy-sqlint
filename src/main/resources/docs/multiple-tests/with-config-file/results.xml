@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<checkstyle version="4.3">
+    <file name="test1.sql">
+        <error source="allIssues" line="6" message="syntax error at or near &quot;FrOM&quot;" severity="error" />
+    </file>
+</checkstyle>
