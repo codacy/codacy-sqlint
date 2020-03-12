@@ -1,4 +1,4 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a00f953169e94bd3a373ebd8e6dcb69e)](https://www.codacy.com/app/Codacy/codacy-sqlint?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=codacy/codacy-sqlint&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a00f953169e94bd3a373ebd8e6dcb69e)](https://www.codacy.com/gh/codacy/codacy-sqlint?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=codacy/codacy-sqlint&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://circleci.com/gh/codacy/codacy-sqlint.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/codacy/codacy-sqlint)
 
 # Codacy SQLint
