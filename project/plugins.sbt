@@ -1,2 +1,1 @@
-resolvers += Resolver.jcenterRepo
-addSbtPlugin("com.codacy" % "codacy-sbt-plugin" % "17.1.4")
+addSbtPlugin("com.codacy" % "codacy-sbt-plugin" % "20.0.2")
