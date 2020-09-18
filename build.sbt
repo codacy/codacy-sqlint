@@ -9,7 +9,7 @@ scalaVersion := "2.13.1"
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.7.4",
-  "com.codacy" %% "codacy-engine-scala-seed" % "5.0.0"
+  "com.codacy" %% "codacy-engine-scala-seed" % "5.0.1"
 )
 
 Universal / javaOptions ++= Seq("-XX:MinRAMPercentage=60.0", "-XX:MaxRAMPercentage=90.0")
