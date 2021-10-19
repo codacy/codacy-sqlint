@@ -47,11 +47,10 @@ mappings in Universal ++= {
 }.value
 
 def installAll(toolVersion: String) =
-  s"""apk --no-cache add bash build-base ruby ruby-dev ruby-json tar curl &&
-     |apk --no-cache add --update ca-certificates &&
-     |gem install --no-ri --no-rdoc sqlint -v $toolVersion &&
+  s"""apk add --no-cache bash build-base ruby ruby-dev ruby-json &&
+     |gem install --no-document sqlint -v $toolVersion &&
      |gem cleanup &&
-     |apk del build-base ruby-dev tar curl &&
+     |apk del build-base ruby-dev &&
      |rm -rf /tmp/*""".stripMargin.replaceAll(System.lineSeparator(), " ")
 
 val dockerUser = "docker"
@@ -61,7 +60,7 @@ daemonUser in Docker := dockerUser
 
 daemonGroup in Docker := dockerGroup
 
-dockerBaseImage := "openjdk:8-jre-alpine"
+dockerBaseImage := "amazoncorretto:8-alpine3.14-jre"
 
 dockerCommands := {
   dockerCommands.value.flatMap {
