@@ -10,3 +10,5 @@
 .bloop
 *~
 .*.swp
+.vscode/
+project/metals.sbt
