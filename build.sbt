@@ -5,12 +5,9 @@ import sjsonnew.support.scalajson.unsafe._
 
 name := "codacy-sqlint"
 
-scalaVersion := "2.13.1"
+scalaVersion := "2.13.8"
 
-libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.7.4",
-  "com.codacy" %% "codacy-engine-scala-seed" % "5.0.1"
-)
+libraryDependencies ++= Seq("com.codacy" %% "codacy-engine-scala-seed" % "5.0.3")
 
 Universal / javaOptions ++= Seq("-XX:MinRAMPercentage=60.0", "-XX:MaxRAMPercentage=90.0")
 
