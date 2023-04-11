@@ -57,7 +57,7 @@ daemonUser in Docker := dockerUser
 
 daemonGroup in Docker := dockerGroup
 
-dockerBaseImage := "amazoncorretto:8-alpine3.14-jre"
+dockerBaseImage := "amazoncorretto:8-alpine3.17-jre"
 
 dockerCommands := {
   dockerCommands.value.flatMap {
