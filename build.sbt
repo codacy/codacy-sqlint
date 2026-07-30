@@ -45,8 +45,9 @@ mappings in Universal ++= {
 
 def installAll(toolVersion: String) =
   s"""apk add --no-cache bash build-base ruby ruby-dev ruby-json &&
-     |gem install --no-document google-protobuf -v 3.25.3 &&
-     |gem install --no-document sqlint -v $toolVersion &&
+     |gem install --no-document rake --platform=ruby &&
+     |gem install --no-document google-protobuf -v 3.25.3 --platform=ruby &&
+     |gem install --no-document sqlint -v $toolVersion --platform=ruby &&
      |gem cleanup &&
      |apk del build-base ruby-dev &&
      |rm -rf /tmp/*""".stripMargin.replaceAll(System.lineSeparator(), " ")
