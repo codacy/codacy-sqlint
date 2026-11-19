@@ -13,3 +13,6 @@
 .*.swp
 .vscode/
 project/metals.sbt
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
