@@ -7,7 +7,7 @@ name := "codacy-sqlint"
 
 scalaVersion := "2.13.16"
 
-libraryDependencies ++= Seq("com.codacy" %% "codacy-engine-scala-seed" % "5.0.3")
+libraryDependencies ++= Seq("com.codacy" %% "codacy-engine-scala-seed" % "6.1.5")
 
 Universal / javaOptions ++= Seq("-XX:MinRAMPercentage=60.0", "-XX:MaxRAMPercentage=90.0")
 
@@ -44,7 +44,7 @@ mappings in Universal ++= {
 }.value
 
 def installAll(toolVersion: String) =
-  s"""apk add --no-cache bash openjdk8-jre build-base &&
+  s"""apk add --no-cache bash openjdk17-jre build-base &&
      |gem install --no-document rake --platform=ruby &&
      |gem install --no-document sqlint -v $toolVersion --platform=ruby &&
      |gem cleanup &&
