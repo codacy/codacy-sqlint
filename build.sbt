@@ -5,9 +5,9 @@ import sjsonnew.support.scalajson.unsafe._
 
 name := "codacy-sqlint"
 
-scalaVersion := "2.13.8"
+scalaVersion := "2.13.16"
 
-libraryDependencies ++= Seq("com.codacy" %% "codacy-engine-scala-seed" % "5.0.3")
+libraryDependencies ++= Seq("com.codacy" %% "codacy-engine-scala-seed" % "6.1.5")
 
 Universal / javaOptions ++= Seq("-XX:MinRAMPercentage=60.0", "-XX:MaxRAMPercentage=90.0")
 
@@ -44,12 +44,11 @@ mappings in Universal ++= {
 }.value
 
 def installAll(toolVersion: String) =
-  s"""apk add --no-cache bash build-base ruby ruby-dev ruby-json &&
+  s"""apk add --no-cache bash openjdk17-jre build-base &&
      |gem install --no-document rake --platform=ruby &&
-     |gem install --no-document google-protobuf -v 3.25.3 --platform=ruby &&
      |gem install --no-document sqlint -v $toolVersion --platform=ruby &&
      |gem cleanup &&
-     |apk del build-base ruby-dev &&
+     |apk del build-base &&
      |rm -rf /tmp/*""".stripMargin.replaceAll(System.lineSeparator(), " ")
 
 val dockerUser = "docker"
@@ -59,7 +58,7 @@ daemonUser in Docker := dockerUser
 
 daemonGroup in Docker := dockerGroup
 
-dockerBaseImage := "amazoncorretto:8-alpine3.17-jre"
+dockerBaseImage := "ruby:4.0.10-alpine"
 
 dockerCommands := {
   dockerCommands.value.flatMap {
